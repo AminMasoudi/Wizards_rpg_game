@@ -5,4 +5,4 @@ An rpg game with socket connection between server and two clients
 - [ ] Logger
 - [ ] main
 - [ ] game logic
- 
+- [ ] error handler
