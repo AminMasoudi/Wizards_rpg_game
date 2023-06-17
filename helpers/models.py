@@ -30,3 +30,4 @@ class Sock(socket):
         if getdefaulttimeout() is None and self.gettimeout():
             sock.setblocking(True)
         return sock, addr
+
