@@ -6,3 +6,4 @@ An rpg game with socket connection between server and two clients
 - [ ] main
 - [ ] game logic
 - [ ] error handler
+- [ ] decorator for try and error handler
