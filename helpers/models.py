@@ -18,7 +18,6 @@ class Sock(socket):
         except:
             return False
         
-
     def recv_msg(self):
         len_of_msg = self.recv(BUFFER_SIZE)
         msg = self.recv(len_of_msg).decode()

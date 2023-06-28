@@ -13,7 +13,7 @@ print(f"[RUNNING]: server is running on {SERVER_IP}:{SERVER_PORT}")
 while True:
     client, addr = server.accept()
     print(f"[NEW CONNECTION]: connected to {addr}")
-    threading.Thread(target=manage_connection, args=(client, addr))
+    threading.Thread(target=manage_connection, args=(client, addr)).start()
     print(f"[ACTIVATED] active client: {threading.active_count()}")
 
     

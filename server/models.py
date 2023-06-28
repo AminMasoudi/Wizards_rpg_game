@@ -31,9 +31,12 @@ class Game():
                 self.play_round()
         
     def is_over(self):
+        """
+        return `True` if game is over (someone dies or other conditions)
+        else return `False`
+        """
         #TODO
-        ...
-    
+     
     def play_round(self):
         #TODO
         ...
@@ -41,7 +44,19 @@ class Game():
     #  
 
 class Role():
-    ...
+    def __init__(self,role_dict) -> None:
+        self.name   = role_dict["name"]
+        self.magic  = role_dict["magic"]
+        self.power  = role_dict["power"]
+
+
+        self.remaining_life      = 100
+        self.effective_defend    = role_dict["e_defend"]
+        self.effective_hit       = role_dict["e_hit"]
+        self.effective_magic     = role_dict["e_magic"]
+        self.magic_recovery_rate = role_dict["MRR"]
+
+
 
 class User():
     def __init__(self, csoc) -> None:
@@ -51,7 +66,9 @@ class User():
 class Player():
     def __init__(self, user) -> None:
         self.user = user
-        self.role = self.user.role
 
     def ask_role(self):
         ...
+        #TODO
+
+

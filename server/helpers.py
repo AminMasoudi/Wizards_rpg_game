@@ -7,7 +7,7 @@ PENDING_GAMES = []
 
 def manage_connection(client: Sock, addr):
     client.send_msg(b"AT")
-    hand_shake = client.recv(2).decode()
+    hand_shake = client.recv_msg()
     if hand_shake != "OK":
         print("[ERROR]: connection failed to maintain")
         client.close()

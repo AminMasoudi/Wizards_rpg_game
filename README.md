@@ -7,3 +7,5 @@ An rpg game with socket connection between server and two clients
 - [ ] game logic
 - [ ] error handler
 - [ ] decorator for try and error handler
+- [ ] Add hand-shakes to Sock
+- [ ] Add id to games
