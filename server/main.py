@@ -1,7 +1,7 @@
 import threading
 from helpers.settings import SERVER_PORT, SERVER_IP
 from helpers.models import Sock
-from .helpers import manage_connection
+from server.router import manage_connection
 
 
 server = Sock()
@@ -14,6 +14,6 @@ while True:
     client, addr = server.accept()
     print(f"[NEW CONNECTION]: connected to {addr}")
     threading.Thread(target=manage_connection, args=(client, addr)).start()
-    print(f"[ACTIVATED] active client: {threading.active_count()}")
+    print(f"[ACTIVATED] active client: {threading.active_count() - 1}")
 
     

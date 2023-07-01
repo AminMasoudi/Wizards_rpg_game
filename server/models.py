@@ -1,3 +1,5 @@
+import threading
+
 class Game():
     
     def __init__(self) -> None:
@@ -22,9 +24,15 @@ class Game():
         try:
             for user in self.players:
                 user.socket.send_msg(msg)
+        
                 return True
         except:
+        
             return False
+
+
+
+
     def start(self):
         if self.init_game(): 
             while not self.is_over():
@@ -38,10 +46,18 @@ class Game():
         #TODO
      
     def play_round(self):
-        #TODO
-        ...
+        # TODO
+        # - [ ] ask for action
+        self.broadcast("action")
+        self.player1.ask_action()
+        self.player2.ask_action()
+
+        # - [ ] 
+
     #player 2
     #  
+
+
 
 class Role():
     def __init__(self,role_dict) -> None:
@@ -66,9 +82,15 @@ class User():
 class Player():
     def __init__(self, user) -> None:
         self.user = user
+        self.socket = user.socket
+        
 
     def ask_role(self):
         ...
         #TODO
 
-
+    def ask_action(self):
+        try:
+            action = self.socket.recv_msg()
+        except:
+            pass
