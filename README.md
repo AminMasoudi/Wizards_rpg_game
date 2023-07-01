@@ -3,9 +3,11 @@ An rpg game with socket connection between server and two clients
 
 ### TODO
 - [ ] Logger
-- [ ] main
+- [x] Connection usr=amin
+- [ ] clean connection part usr=amin
 - [ ] game logic
-- [ ] error handler
-- [ ] decorator for try and error handler
-- [ ] Add hand-shakes to Sock
-- [ ] Add id to games
+- [ ] clean game part
+- [ ] learn pygame      usr=amin+far
+- [ ] use pygame 
+- [ ] final check
+- [ ] upload    usr=far+amin
