@@ -21,7 +21,7 @@ class Sock(socket):
         super().__init__(family, type, proto, fileno)
 
 
-    def send_msg(self, msg:str):
+    def send_msg(self, msg):
         """ takes an `str` and first send the len then sends the `msg`"""
 
         msg = msg.encode()
@@ -30,8 +30,14 @@ class Sock(socket):
         time.sleep(0.5)
         self.send(msg)
 
+    def send_json(self, my_dict):
+        my_dict = json.dumps(my_dict).encode()
+        l   = str(len(my_dict)).encode()
+        self.send(l)
+        time.sleep(0.5)
+        self.send(my_dict)
 
-    def send_command(self, command : str, args : list):
+    def send_command(self, command : str, args : dict):
         """takes a command name as `command` and needed `args`"""
         com = {
             "command":command,
@@ -57,6 +63,11 @@ class Sock(socket):
         len_of_msg  = self.recv(BUFFER_SIZE).decode()
         msg         = self.recv(int(len_of_msg)).decode()
         return msg
+    
+    def recv_json(self):
+        data = self.recv_command()
+        return data
+
 
     def accept(self):
         fd, addr = self._accept()

@@ -1,31 +1,39 @@
 import threading
+import time 
+ROLES = []
+
 
 class Game():
     
     def __init__(self) -> None:
         self.inited = False
         self.pending = True
-        self.players = []
+        self.player1 = None
+        self.player2 = None
 
     def init_game(self):
-        try:
-            b = True
-            self.player1 = Player(self.players[0])
-            self.player2 = Player(self.players[1])
-            b *= self.player1.ask_role()
-            b *= self.player2.ask_role()
-            b *= self.broadcast("{game_status : 'inited' }")
-            self.inited = True
-            return b
-        except:
-            return False
+        print(self.player1, self.player2)
+        self.player1.ask_role()
+        self.player2.ask_role()
+        time.sleep(10)
+        self.player1.default_role()
+        self.player2.default_role()
 
-    def broadcast(self, msg):
+        self.broadcast("game_inited", "new_status")
+        self.inited = True
+
+
+    def broadcast(self, status, type, ):
         try:
-            for user in self.players:
-                user.socket.send_msg(msg)
-        
-                return True
+            self.player1.socket.send_json({
+                "type": type,
+                "status" : status
+            })
+            self.player1.socket.send_json({
+                "type": type,
+                "status" : status
+            })
+
         except:
         
             return False
@@ -34,9 +42,10 @@ class Game():
 
 
     def start(self):
-        if self.init_game(): 
-            while not self.is_over():
-                self.play_round()
+        self.init_game()
+        print("inited")
+        while not self.is_over():
+            self.play_round()
         
     def is_over(self):
         """
@@ -48,9 +57,8 @@ class Game():
     def play_round(self):
         # TODO
         # - [ ] ask for action
-        self.broadcast("action")
-        self.player1.ask_action()
-        self.player2.ask_action()
+        threading.Thread(target=self.player2.ask_action()).start()
+        threading.Thread(target=self.player1.ask_action()).start()
 
         # - [ ] 
 
@@ -61,6 +69,7 @@ class Game():
 
 class Role():
     def __init__(self,role_dict) -> None:
+        self.role_dict = role_dict
         self.name   = role_dict["name"]
         self.magic  = role_dict["magic"]
         self.power  = role_dict["power"]
@@ -72,6 +81,8 @@ class Role():
         self.effective_magic     = role_dict["e_magic"]
         self.magic_recovery_rate = role_dict["MRR"]
 
+    def serilizer(self):
+        return self.role_dict
 
 
 class User():
@@ -80,14 +91,22 @@ class User():
 
 
 class Player():
-    def __init__(self, user) -> None:
-        self.user = user
-        self.socket = user.socket
-        
+    def __init__(self, socket) -> None:
+        self.socket = socket
+        self.role = None
+        #TODO UUID and roll asking
 
     def ask_role(self):
-        ...
-        #TODO
+        print(f"[ask role] {self}")
+        roles = list(map(lambda x: x.serilizer(), ROLES))
+        self.socket.send_json({
+            "type" : "ask_role",
+            "roles" : roles
+        })
+
+    def default_role(self):
+        if not self.role:
+            self.role = ROLES[0]
 
     def ask_action(self):
         try:

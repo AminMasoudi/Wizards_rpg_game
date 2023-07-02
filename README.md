@@ -4,7 +4,7 @@ An rpg game with socket connection between server and two clients
 ### TODO
 - [ ] Logger
 - [x] Connection usr=amin
-- [ ] clean connection part usr=amin
+- [x] clean connection part usr=amin
 - [ ] game logic
 - [ ] clean game part
 - [ ] learn pygame      usr=amin+far

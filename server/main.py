@@ -2,7 +2,7 @@ import threading
 from helpers.settings import SERVER_PORT, SERVER_IP
 from helpers.models import Sock
 from server.router import manage_connection
-
+from consts import sockets
 
 server = Sock()
 server.bind((SERVER_IP, SERVER_PORT))

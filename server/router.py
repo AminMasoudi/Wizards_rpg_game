@@ -1,16 +1,14 @@
-from helpers.models import Sock
-from .models import Game, User
+
 from . import views
 import threading
 
 websocket_pattern = {
     "command" : "function",
     "foo"     : views.foo,
+    "join"    : views.join,
     
 }
 
-ON_GOING_GAMES  = []
-PENDING_GAMES   = []
 
 def manage_connection(client, addr):
 
@@ -18,7 +16,8 @@ def manage_connection(client, addr):
         command = client.recv_command()
         if command:
             function = websocket_pattern[command["command"]]
-            threading.Thread(target=function, args=command["args"]).start()
+            command["args"]["socket"] = client
+            threading.Thread(target=function, args=(command["args"],)).start()
             
         else: 
             print(f"[DETACHED]: connection lost with {addr}")
@@ -30,7 +29,12 @@ def manage_connection(client, addr):
 
 
 #{"command" : "command_name",
-# "args": [
-#       arg1,
-#       arg2,
-# ]}
+# "args": {
+#       arg1:foo,
+#       arg2:bar,
+# }}
+
+
+#{"command": "join",
+#args : {"socket" : client}
+#}
