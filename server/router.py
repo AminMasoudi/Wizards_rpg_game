@@ -6,7 +6,9 @@ websocket_pattern = {
     "command" : "function",
     "foo"     : views.foo,
     "join"    : views.join,
-    
+    "ask_info": views.get_info,
+    "submit_role"   : views.submit_role,
+    "post_action"   : views.action,
 }
 
 

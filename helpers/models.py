@@ -33,8 +33,9 @@ class Sock(socket):
     def send_json(self, my_dict):
         my_dict = json.dumps(my_dict).encode()
         l   = str(len(my_dict)).encode()
+        l = (64 - len(l))* b"0" +l
         self.send(l)
-        time.sleep(0.5)
+        time.sleep(0.7)
         self.send(my_dict)
 
     def send_command(self, command : str, args : dict):

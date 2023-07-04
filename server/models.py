@@ -1,6 +1,7 @@
 import threading
 import time 
-ROLES = []
+from consts import ROLES
+
 
 
 class Game():
@@ -15,7 +16,7 @@ class Game():
         print(self.player1, self.player2)
         self.player1.ask_role()
         self.player2.ask_role()
-        time.sleep(10)
+        time.sleep(15)
         self.player1.default_role()
         self.player2.default_role()
 
@@ -29,10 +30,11 @@ class Game():
                 "type": type,
                 "status" : status
             })
-            self.player1.socket.send_json({
+            self.player2.socket.send_json({
                 "type": type,
                 "status" : status
             })
+            print("[game inited]")
 
         except:
         
@@ -55,16 +57,38 @@ class Game():
         #TODO
      
     def play_round(self):
-        # TODO
-        # - [ ] ask for action
-        threading.Thread(target=self.player2.ask_action()).start()
-        threading.Thread(target=self.player1.ask_action()).start()
+        time.sleep(5)
+        print("[Calculating] Calculating game result")
+        p1 = self.player1
+        p2 = self.player2
 
-        # - [ ] 
+        p1.calc_rem_life(p2.last_action)
+        p2.calc_rem_life(p1.last_action)
 
-    #player 2
-    #  
+        p1.last_action = False
+        p2.last_action = False
 
+        p1.socket.send_json({
+            "type" : "game_info",
+            "content" : {
+                "player" : p1.role.ser(),
+                "player_b"   : p1.role.ser(),
+            },
+        })
+        p2.socket.send_json({
+            "type" : "game_info",
+            "content" : {
+                "player" : p2.role.ser(),
+                "player_b"   : p1.role.ser(),
+            },
+        })
+
+
+
+        # waite 10 sec
+        # calculate rem lives
+        # reset action and flags and ...
+        # send them the result
 
 
 class Role():
@@ -81,8 +105,13 @@ class Role():
         self.effective_magic     = role_dict["e_magic"]
         self.magic_recovery_rate = role_dict["MRR"]
 
-    def serilizer(self):
-        return self.role_dict
+    def ser(self):
+        content = {
+            "name"    : self.name,
+            "re_life" : self.remaining_life,
+            "magic"   : self.magic,  
+        }
+        return  content
 
 
 class User():
@@ -94,22 +123,26 @@ class Player():
     def __init__(self, socket) -> None:
         self.socket = socket
         self.role = None
+        self.last_action = False
         #TODO UUID and roll asking
 
     def ask_role(self):
         print(f"[ask role] {self}")
-        roles = list(map(lambda x: x.serilizer(), ROLES))
+        # roles = list(map(lambda x: x.serilizer(), ROLES))
         self.socket.send_json({
             "type" : "ask_role",
-            "roles" : roles
+            "roles" : ROLES
         })
 
     def default_role(self):
         if not self.role:
-            self.role = ROLES[0]
+            self.role = Role(ROLES[0])
 
     def ask_action(self):
         try:
             action = self.socket.recv_msg()
         except:
             pass
+    def calc_rem_life(self, oaction):
+        self.role.remaining_life -= 10
+        self.role.magic -= 1

@@ -1,11 +1,11 @@
 import os
 
-SIZE = WIDTH, HEIGHT = 800, 450
+SIZE = WIDTH, HEIGHT = 1920, 1200
 FPS = 60
 GAME_NAME="RPG"
-BG_COLOR = (75, 75, 75)
+BG_COLOR = "#888888"
 FONT = None
-page = "index"
+
 
 def set_page(page):
     os.environ["PAGE"] = page
@@ -13,5 +13,3 @@ def set_page(page):
 def get_page():
     return os.getenv("PAGE")
 
-
-set_page(page)
