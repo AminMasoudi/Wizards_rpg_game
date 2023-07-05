@@ -2,7 +2,7 @@ import threading
 import time 
 from consts import ROLES
 
-
+import random
 
 class Game():
     
@@ -41,8 +41,6 @@ class Game():
             return False
 
 
-
-
     def start(self):
         self.init_game()
         print("inited")
@@ -54,6 +52,20 @@ class Game():
         return `True` if game is over (someone dies or other conditions)
         else return `False`
         """
+        p1_dead  = self.player1.role.remaining_life < 1
+        p2_dead = self.player2.role.remaining_life < 1
+        over = False
+        if p1_dead and not p2_dead:
+            self.winner = self.player2
+            over = True
+        elif (not p1_dead) and p2_dead:
+            self.winner = self.player1
+            over = True
+        elif p1_dead and p2_dead:
+            over = True 
+            self.winner = False
+                    
+        return over
         #TODO
      
     def play_round(self):
@@ -62,8 +74,8 @@ class Game():
         p1 = self.player1
         p2 = self.player2
 
-        p1.calc_rem_life(p2.last_action)
-        p2.calc_rem_life(p1.last_action)
+        p1.calc_rem_life(p2)
+        p2.calc_rem_life(p1)
 
         p1.last_action = False
         p2.last_action = False
@@ -138,11 +150,22 @@ class Player():
         if not self.role:
             self.role = Role(ROLES[0])
 
-    def ask_action(self):
-        try:
-            action = self.socket.recv_msg()
-        except:
-            pass
-    def calc_rem_life(self, oaction):
-        self.role.remaining_life -= 10
-        self.role.magic -= 1
+    def calc_rem_life(self, o_player):
+        # self.role.remaining_life -= 10
+        # self.role.magic -= 1
+        o_action = o_player.last_action
+        
+        if o_action == "attack":
+            if self.last_action == "defend":
+                #calculate
+                to_effect = o_player.role.effective_hit /100
+                n = 1-to_effect
+                if random.choices([0,1],[n,to_effect]):
+                    self.role.remaining_life -= o_player.role.power
+                
+            else:
+                self.role.remaining_life -= o_player.role.power
+
+        elif o_action == "magic":
+            ...
+        

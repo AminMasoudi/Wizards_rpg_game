@@ -56,17 +56,29 @@ def main():
             # midel line
             midel_x, _ = screen.screen_rec.center
             screen.draw_vertical_line(midel_x)
+            
+            
             # btn
+
 
             for role in range(len(connection.roles)):
                 top = ((2*HEIGHT)//6 + role*100 + 20)
                 screen.draw_btn((75, top), connection.roles[role]["name"], role=connection.roles[role])
 
             for btn in screen.btn:
+                if btn.is_touched():
+                    screen.explain_role = btn.data
                 if btn.clicked() and not connection.sended:
                     submit_role(connection, btn.data)
                     print("submit")
-        
+            try :
+                screen.draw_text_l(f"Name :    {screen.explain_role['name']}", (1060, 120),"White" )
+
+                screen.draw_text_m(f"power :    {screen.explain_role['power']}", (1060, 170), "White")
+            except:
+                pass
+            
+
         elif page ==     "game":
             screen.btn = []
 
