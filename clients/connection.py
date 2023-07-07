@@ -58,11 +58,21 @@ class WebServer:
     def __init__(self, uri, screen) -> None:
         self.screen = screen
         self.client = screen.client
+        self.submited   = False
         self.connection = websocket.WebSocket()
         cookie = f"csrftoken={self.client.csrf}; sessionid={self.client.session}"
         self.connection.connect(f"ws://127.0.0.1:8000/ws/{uri}",cookie=cookie)
         threading.Thread(target=self.ws_listening).start()
-        
+
+    def submit_action(self, btn_data):
+        if not self.submited:
+            data = json.dumps({
+                "type" : "submit",
+                "action": btn_data
+            })
+            self.connection.send(data)
+            self.submited = True
+
     def ws_listening(self):
         while self.connection:
             recv = self.connection.recv()
@@ -70,4 +80,12 @@ class WebServer:
             if recv["type"] == "status":
                 if recv["status"] == "started":
                     self.screen.game_info["status"] = "started"
-                    print(self.screen.game_info["status"])
+                    self.screen.game_info = self.client.get_game_info()
+
+                if recv["status"] == "new":
+                    self.submited = False 
+                    self.screen.game_info = self.client.get_game_info()                    
+                    print("SSSSSSSSSSSS")
+
+            else:
+                print(recv)

@@ -29,6 +29,34 @@ class LobbyConsumer(WebsocketConsumer):
                 }
             )
         
+    def receive(self, text_data=None, bytes_data=None):
+        text_data_json = json.loads(text_data)
+        if text_data_json["type"] == "submit":
+            self.player.last_action = text_data_json["action"]
+            self.player.save()
+            # check for both results
+            l = self.game.player.all()
+            p1 = l[0]
+            p2 = l[1]
+            if p1.last_action and p2.last_action :
+                p1.calculate(p2)                    
+                p2.calculate(p1)                    
+                p1.last_action = ""
+                p2.last_action = ""
+                p1.save()
+                p2.save()
+                async_to_sync(self.channel_layer.group_send)(
+                    str(self.game.pk),
+                    {
+                        "type" : "status",
+                        "status": "new"
+                    }
+                )
+
+
+        
+
+
 
     def status(self, event):
         type = event["type"]
@@ -39,5 +67,3 @@ class LobbyConsumer(WebsocketConsumer):
         }))
 
 
-
-        

@@ -91,9 +91,67 @@ class Screen:
             
         if self.game_info['status'] == "started":
             self.draw_vertical_line()
-            if not self.game_init_api:
-                self.game_info = self.client.get_game_info()
-                self.game_init_api = True
+            p1_center = self.screen_rect.width // 4
+            p2_center = 3 * self.screen_rect.width // 4
+            l1 = LifeBar(p1_center, self.screen)
+            l2 = LifeBar(p2_center, self.screen)
+            
+            try:
+                re_life_1   = self.game_info["player"]["u_player"]["role"]["re_life"]
+                p_role_name = self.game_info["player"]["u_player"]["role"]["name"]
+                p_magic     = self.game_info["player"]["u_player"]["role"]["magic"]
+
+                re_life_2   = self.game_info["player"]["o_player"]["role"]["re_life"]
+                p2_role_name= self.game_info["player"]["o_player"]["role"]["name"]
+                p2_magic    = self.game_info["player"]["o_player"]["role"]["magic"]
+
+
+            except:
+                re_life_1    = 0
+                re_life_2    = 0
+
+                p_role_name  = "FOO"
+                p2_role_name = "BAR"
+
+                p_magic     = 0
+                p2_magic    = 0
+
+
+
+            l2_left = l2.rect.left  + (100-re_life_2) * 8
+            l1.draw_life(l1.rect.left, re_life_1)
+            l2.draw_life(l2_left, re_life_2)
+            
+            #name
+            self.draw_text_l(f"NAME : {p_role_name}", (p1_center, 300))
+            self.draw_text_l(f"NAME : {p2_role_name}", (p2_center, 300))
+            #re_life
+            self.draw_text_m(f"Remaining life : {re_life_1}",(p1_center, 365))
+            self.draw_text_m(f"Remaining life : {re_life_2}",(p2_center, 365))
+            #magic
+            self.draw_text_m(f"Magics : {p_magic}", (p1_center, 420))
+            self.draw_text_m(f"Magics : {p2_magic}", (p2_center, 420))
+            
+            #btn
+            #defend
+            defend_btn = Button((180, 1080), 200, 75, "defend")
+            defend_btn.draw_btn(self.screen, self.medium_font, "Defend")
+            self.btn.append(defend_btn)
+            #attack
+            attack = Button((480,1080), 200, 75, "attack")
+            attack.draw_btn(self.screen, self.medium_font, "Attack")
+            self.btn.append(attack)
+
+            magic = Button((780, 1080), 200, 75, "magic")
+            magic.draw_btn(self.screen, self.medium_font, "Magic")
+            self.btn.append(magic)
+
+            for btn in self.btn:
+                if btn.clicked():
+                    self.ws.submit_action(btn.data)
+        
+            
+
         else:
             self.draw_text_l(f"STATUS : {self.game_info['status']}", self.screen_rect.center)
         
@@ -158,6 +216,7 @@ class Button:
         self.rect = pg.Rect(center[0], center[1], width, height)  
         self.rect.center = center                                                       
         self.data = data
+
     def draw_btn(self, surf, font, text):
         self.is_touched()
         btn_text = font.render(text, True, self.text_color)
@@ -178,6 +237,18 @@ class Button:
 
     def clicked(self):
         cl, _, _ = pg.mouse.get_pressed()
-        if self.is_touched and cl:
+        if self.is_touched() and cl:
             return True
         return False
+    
+class LifeBar:
+    def __init__(self, center_x_pos, surf) -> None:
+        self.surf = surf
+        self.rect = pg.Rect(100, 120, 800, 100)
+        self.rect.center = (center_x_pos, 170)
+        pg.draw.rect(surf, "white", self.rect, 2, 5)
+
+    def draw_life(self, left, re_life):
+        re_life *= 8
+        life_rect = pg.Rect(left, 120, re_life, 100)
+        pg.draw.rect(self.surf, "White", life_rect)

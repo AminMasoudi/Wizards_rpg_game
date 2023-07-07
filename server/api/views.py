@@ -37,7 +37,7 @@ def define_role(request):
     player = Player.objects.get(username=request.user.username)
     role = Roles.objects.get(id=request.POST["id"])
     player.remaining_life = 100
-    player.set_role = role.dict()
+    player.set_role(role.dict())
     return Response({"result" : "ok"})
 
 
