@@ -128,8 +128,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ASGI_APPLICATION = 'server.asgi.application'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ]
+CHANNEL_LAYERS = {
+    'default':{
+        #FIXME: ONLY on TEST ADD redis later
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
 }

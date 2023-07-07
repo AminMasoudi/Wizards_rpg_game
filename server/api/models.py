@@ -2,14 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 # Create your models here.
 
-class Player(User):
-    username = models.CharField(
-    max_length=15,
-    unique=True,
-    ),
-    password = 1234
-    
-
 
 class Roles(models.Model):
     name    = models.CharField(max_length=15)
@@ -33,3 +25,23 @@ class Roles(models.Model):
             "ef_magic"  : self.ef_magic
         }
         return content
+    
+
+
+
+class Game(models.Model):
+    status     = models.CharField(max_length=10, default="Pending")
+
+
+
+class Player(User):
+    username = models.CharField(
+    max_length=15,
+    unique=True,
+    ),
+    role = models.JSONField(null=True)
+    password = 1234
+    game = models.ManyToManyField(Game, blank=True, related_name="player")
+
+    def set_role(self, role_dict):
+        self.role = role_dict

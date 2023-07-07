@@ -1,5 +1,7 @@
 import requests
 import websocket
+import threading
+import json
 
 HOST = "http://127.0.0.1:8000"
 
@@ -26,6 +28,9 @@ class Client:
         res = self.client.post(HOST + "/auth", content)
         if res.ok:
             self.csrf = res.cookies["csrftoken"]
+            print(res.cookies)
+            self.session = res.cookies["sessionid"]
+
             return res.json()
     
     def post_role_id(self, id):
@@ -42,10 +47,27 @@ class Client:
         if res.ok:
             return res.json()
         return False
+    
+    def get_game_info(self):
+        url = HOST + "/get_game_info"
+        res = self.client.get(url)
+        if res.ok:
+            return res.json()
 
 class WebServer:
-    def __init__(self, uri, csrf_token, sessionid) -> None:
+    def __init__(self, uri, screen) -> None:
+        self.screen = screen
+        self.client = screen.client
         self.connection = websocket.WebSocket()
-        cookie = f"csrftoken={csrf_token}; sessionid={sessionid}"
-        self.connection.connect(f"ws://{HOST}/ws/{uri}",cookie=cookie)
+        cookie = f"csrftoken={self.client.csrf}; sessionid={self.client.session}"
+        self.connection.connect(f"ws://127.0.0.1:8000/ws/{uri}",cookie=cookie)
+        threading.Thread(target=self.ws_listening).start()
         
+    def ws_listening(self):
+        while self.connection:
+            recv = self.connection.recv()
+            recv = json.loads(recv)
+            if recv["type"] == "status":
+                if recv["status"] == "started":
+                    self.screen.game_info["status"] = "started"
+                    print(self.screen.game_info["status"])

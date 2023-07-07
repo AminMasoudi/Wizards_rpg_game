@@ -7,6 +7,7 @@ class Screen:
         self.page           = "index"
         self.screen         = pg.display.set_mode(size)
         self.client         = Client()
+        self.status         = ''
         self.er_msg         = ""
         self.text_input     = ""
         self.large_font     = pg.font.Font("clients/OpenSans-Regular.ttf", 70)
@@ -47,11 +48,13 @@ class Screen:
             if btn.clicked() :
                 if self.client.post_role_id(self.roles[role_index]["id"]):
                     game_data = self.client.get_game()
-                    
                     if game_data:
                         self.game_info = game_data
-                        self.page = "lobby"
-
+                        print(self.game_info)
+                        self.game_init_api = False
+                        self.page = "game"
+                        self.ws_connection = False
+                        
                 else:
                     print("[FAILED] failed to submit the role")
                     
@@ -76,6 +79,24 @@ class Screen:
         except:
             pass
 
+    def game_page(self):
+        self.btn = []
+
+        if not self.ws_connection:
+            self.ws = WebServer(f"socket-server/{self.game_info['pk']}",self)  
+            #TODO listening ws
+            self.ws_connection = True
+
+
+            
+        if self.game_info['status'] == "started":
+            self.draw_vertical_line()
+            if not self.game_init_api:
+                self.game_info = self.client.get_game_info()
+                self.game_init_api = True
+        else:
+            self.draw_text_l(f"STATUS : {self.game_info['status']}", self.screen_rect.center)
+        
     
     def event_handler(self):
 

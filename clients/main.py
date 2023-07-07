@@ -38,15 +38,9 @@ def main():
                 screen.roles = roles
             screen.role_page()
 
-        if screen.page == "lobby":
-            screen.lobby_ws = WebServer("lobby", screen.client.csrf)
-            
-
-
         if screen.page == "game":
-            #connect to websocket
-            ...
-        
+            screen.game_page()            
+             
 
         pg.display.update()
         clock.tick(FPS)
