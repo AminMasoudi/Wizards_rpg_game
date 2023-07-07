@@ -55,12 +55,12 @@ class Player(User):
         if o_actor.last_action == "attack":
             self.role["re_life"] -= o_actor.role["power"]
             
-        elif self.last_action == "defend":
+        elif self.last_action == "defend" and o_actor.last_action == "magic":
             to_defend = self.role["ef_defend"] // 100
 
             defend = random.choices([0,1],[1- to_defend, to_defend])
 
-            if not defend and o_actor.last_action == "magic":
+            if not defend:
                 self.role["re_life"] -= o_actor.role["ef_magic"]
 
         self.save()

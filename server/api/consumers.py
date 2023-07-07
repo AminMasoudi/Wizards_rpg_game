@@ -32,7 +32,7 @@ class LobbyConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         if text_data_json["type"] == "submit":
-            self.player.last_action = text_data_json["action"]
+            self.player.last_action = ["action"]
             self.player.save()
             # check for both results
             l = self.game.player.all()
