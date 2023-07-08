@@ -8,5 +8,6 @@ urlpatterns = [
     path(r"roles", views.get_roles, name="all_roles"),
     path(r"role_submission", views.define_role),
     path(r"get_game", views.get_game, name="get_game"),
-    path(r"get_game_info", views.game_info, name="game_info")
+    path(r"get_game_info", views.game_info, name="game_info"),
+    path(r"get_result", views.game_result, name="result")
 ]

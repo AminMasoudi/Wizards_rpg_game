@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login
 from .models import Player, Roles, Game
-from .serializers import RoleSerializer, GameSerializer, PlayerSerializer
+from .serializers import RoleSerializer, GameSerializer, PlayerSerializer, ResultSerializer
 
 # Create your views here.
 
@@ -76,3 +76,17 @@ def game_info(request):
             tmp["o_player"] = PlayerSerializer(op).data
     content["player"] = tmp
     return Response(content)
+
+@api_view(["GET"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def game_result(request):
+    player   = Player.objects.get(pk=request.user.pk)
+    game     = player.game.first()
+    ser_game = ResultSerializer(game)
+    ser_game.data["status"] = "ended"
+    if ser_game.data["result"]["winner"] == player.username:
+        ser_game.data["you_w"] = True
+    else:
+        ser_game.data["you_w"] = False
+    return Response(ser_game.data)

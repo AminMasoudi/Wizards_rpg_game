@@ -50,7 +50,6 @@ class Screen:
                     game_data = self.client.get_game()
                     if game_data:
                         self.game_info = game_data
-                        print(self.game_info)
                         self.game_init_api = False
                         self.page = "game"
                         self.ws_connection = False
@@ -150,12 +149,14 @@ class Screen:
                 if btn.clicked():
                     self.ws.submit_action(btn.data)
         
-            
+        elif self.game_info['status'] == "ended":
+            self.draw_text_l("YOU WIN" if self.game_info["result"]["winner"]==self.text_input else "GAME OVER",
+                            center_pos=self.screen_rect.center) 
 
         else:
             self.draw_text_l(f"STATUS : {self.game_info['status']}", self.screen_rect.center)
         
-    
+
     def event_handler(self):
 
         for event in pg.event.get():

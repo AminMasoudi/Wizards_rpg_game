@@ -33,9 +33,39 @@ class Roles(models.Model):
 
 class Game(models.Model):
     status     = models.CharField(max_length=10, default="Pending")
+    result     = models.JSONField(default=dict)
+    round_number= models.SmallIntegerField(default=1)
 
+    def add_result(self):
+        ps = self.player.all()
+        content = {
+            "player1" : ps[0].last_action,
+            "player1_life" : ps[0].role["re_life"],
 
+            "player2" : ps[1].last_action,
+            "player2_life" : ps[1].role["re_life"],
 
+        }
+        try:
+            self.result["rounds"][self.round_number] = content
+        except:
+            self.result["rounds"] = {}
+            self.result["rounds"][self.round_number] = content
+
+        self.round_number += 1
+        self.save()
+    
+    def winner(self):
+        p1, p2 = self.player.all()
+        p1_dead = (p1.role["re_life"] <= 0)
+        p2_dead = (p2.role["re_life"] <= 0)
+        if p1_dead and p2_dead:
+            self.result["winner"] = "EQUAL"
+        elif p1_dead:
+            self.result["winner"] = p2.username
+        else:
+            self.result["winner"] = p2.username
+        self.save()
 class Player(User):
     username = models.CharField(
     max_length=15,

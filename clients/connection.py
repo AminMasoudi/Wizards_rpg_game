@@ -53,6 +53,13 @@ class Client:
         res = self.client.get(url)
         if res.ok:
             return res.json()
+    
+    def get_result(self):
+        url = HOST + "/get_result"
+        res = self.client.get(url)
+        if res.ok:
+            return res.json()
+
 
 class WebServer:
     def __init__(self, uri, screen) -> None:
@@ -74,7 +81,7 @@ class WebServer:
             self.submited = True
 
     def ws_listening(self):
-        while self.connection:
+        while self.connection.connected:
             recv = self.connection.recv()
             recv = json.loads(recv)
             if recv["type"] == "status":
@@ -82,10 +89,14 @@ class WebServer:
                     self.screen.game_info["status"] = "started"
                     self.screen.game_info = self.client.get_game_info()
 
-                if recv["status"] == "new":
+                elif recv["status"] == "new":
                     self.submited = False 
                     self.screen.game_info = self.client.get_game_info()                    
                     print("SSSSSSSSSSSS")
+
+                elif recv["status"] == "ended":
+                    self.connection.close()
+                    self.screen.game_info = self.client.get_result()                  
 
             else:
                 print(recv)

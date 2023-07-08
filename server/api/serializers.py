@@ -16,3 +16,8 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ["username", "role"]
+
+class ResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = ["result", "status"]

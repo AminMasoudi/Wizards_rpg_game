@@ -39,11 +39,13 @@ class LobbyConsumer(WebsocketConsumer):
             p1 = l[0]
             p2 = l[1]
             over = (p1.role["re_life"] <= 0) or (p2.role["re_life"] <= 0)
+            self.game = player.game.first()
             if p1.last_action and p2.last_action and not over :
                 p1.calculate(p2)                    
-                p2.calculate(p1)                    
-                p1.last_action = ""
-                p2.last_action = ""
+                p2.calculate(p1)
+                self.game.add_result()
+                # p1.last_action = ""
+                # p2.last_action = ""
                 p1.save()
                 p2.save()
                 async_to_sync(self.channel_layer.group_send)(
@@ -54,6 +56,10 @@ class LobbyConsumer(WebsocketConsumer):
                     }
                 )
             elif over:
+                self.game.status = "ended"
+                self.game.save()
+                self.game.winner()
+
                 async_to_sync(self.channel_layer.group_send)(
                     str(self.game.pk),
                     {
@@ -61,11 +67,9 @@ class LobbyConsumer(WebsocketConsumer):
                         "status" : "ended"
                     }
                 )
-                self.disconnect()
 
+    
 
-
-        
 
 
 
