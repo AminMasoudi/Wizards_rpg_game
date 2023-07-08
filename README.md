@@ -7,6 +7,6 @@ group members = fazaneh salimi and amin masoudi
 
 
 ### TODO
-- [ ] Logger
-- [ ] game logic
+- [x] Logger
+- [x] game logic
  
